@@ -14,7 +14,7 @@
   
   "forwardPorts": [8080],
   
-  "postCreateCommand": "go version && curl -LsSf https://astral.sh/uv/install.sh | sh",
+  "postCreateCommand": "go version && curl -LsSf https://astral.sh/uv/install.sh | sh && export PATH=\"$HOME/.cargo/bin:$PATH\" && uv tool install specify-cli --from git+https://github.com/github/spec-kit.git",
   
   "remoteUser": "vscode"
 }
