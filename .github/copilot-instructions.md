@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/002-interactive-city-search/plan.md
+at specs/003-city-attractions-spike/plan.md
 <!-- SPECKIT END -->
