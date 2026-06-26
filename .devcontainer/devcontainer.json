@@ -1,0 +1,20 @@
+{
+  "name": "Travel Itinerary Generator",
+  "image": "mcr.microsoft.com/devcontainers/go:1.26",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "github.copilot",
+        "github.copilot-chat"
+      ]
+    }
+  },
+  
+  "forwardPorts": [8080],
+  
+  "postCreateCommand": "go version",
+  
+  "remoteUser": "vscode"
+}
