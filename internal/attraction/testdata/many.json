@@ -1,0 +1,19 @@
+{
+  "head": { "vars": ["itemLabel", "typeLabel", "itemDescription", "sitelinks"] },
+  "results": {
+    "bindings": [
+      { "itemLabel": { "value": "Attraction 01" }, "typeLabel": { "value": "landmark" }, "sitelinks": { "value": "30" } },
+      { "itemLabel": { "value": "Attraction 02" }, "typeLabel": { "value": "museum" }, "sitelinks": { "value": "120" } },
+      { "itemLabel": { "value": "Attraction 03" }, "typeLabel": { "value": "landmark" }, "sitelinks": { "value": "60" } },
+      { "itemLabel": { "value": "Attraction 04" }, "typeLabel": { "value": "park" }, "sitelinks": { "value": "10" } },
+      { "itemLabel": { "value": "Attraction 05" }, "typeLabel": { "value": "museum" }, "sitelinks": { "value": "110" } },
+      { "itemLabel": { "value": "Attraction 06" }, "typeLabel": { "value": "landmark" }, "sitelinks": { "value": "50" } },
+      { "itemLabel": { "value": "Attraction 07" }, "typeLabel": { "value": "monument" }, "sitelinks": { "value": "90" } },
+      { "itemLabel": { "value": "Attraction 08" }, "typeLabel": { "value": "bridge" }, "sitelinks": { "value": "70" } },
+      { "itemLabel": { "value": "Attraction 09" }, "typeLabel": { "value": "museum" }, "sitelinks": { "value": "100" } },
+      { "itemLabel": { "value": "Attraction 10" }, "typeLabel": { "value": "square" }, "sitelinks": { "value": "20" } },
+      { "itemLabel": { "value": "Attraction 11" }, "typeLabel": { "value": "castle" }, "sitelinks": { "value": "80" } },
+      { "itemLabel": { "value": "Attraction 12" }, "typeLabel": { "value": "garden" }, "sitelinks": { "value": "40" } }
+    ]
+  }
+}

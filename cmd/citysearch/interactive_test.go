@@ -2,11 +2,23 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"io"
 	"strings"
 	"testing"
 
 	"github.com/PedroVallejoSeade/generador-itinerarios-viaje/internal/city"
 )
+
+// noLookupFetcher fails the test if it is ever called: the existing search-only
+// scenarios never select a city, so no attractions lookup must occur.
+func noLookupFetcher(t *testing.T) func(context.Context, string) ([]byte, error) {
+	return func(context.Context, string) ([]byte, error) {
+		t.Helper()
+		t.Fatal("attraction fetcher called unexpectedly (no selection was made)")
+		return nil, nil
+	}
+}
 
 // fixtureCities is a small, deterministic dataset for driving the interactive
 // session in tests. It includes three "London" entries (one with an empty
@@ -58,7 +70,7 @@ func countNumberedLines(s string) int {
 // immediately-EOF reader proves the greeting does not depend on input.
 func TestRunInteractive_WelcomeAndPromptBeforeInput(t *testing.T) {
 	var out bytes.Buffer
-	code := runInteractive(strings.NewReader(""), &out, fixtureCities())
+	code := runInteractive(strings.NewReader(""), &out, io.Discard, fixtureCities(), noLookupFetcher(t))
 	if code != 0 {
 		t.Fatalf("runInteractive exit = %d, want 0", code)
 	}
@@ -83,7 +95,7 @@ func TestRunInteractive_WelcomeAndPromptBeforeInput(t *testing.T) {
 // them, with the region gracefully omitted when empty.
 func TestRunInteractive_NumberedResults(t *testing.T) {
 	var out bytes.Buffer
-	code := runInteractive(strings.NewReader("London\n"), &out, fixtureCities())
+	code := runInteractive(strings.NewReader("London\n"), &out, io.Discard, fixtureCities(), noLookupFetcher(t))
 	if code != 0 {
 		t.Fatalf("runInteractive exit = %d, want 0", code)
 	}
@@ -117,7 +129,7 @@ func TestRunInteractive_NumberedResults(t *testing.T) {
 // performing a search.
 func TestRunInteractive_EmptyInput(t *testing.T) {
 	var out bytes.Buffer
-	code := runInteractive(strings.NewReader("   \n"), &out, fixtureCities())
+	code := runInteractive(strings.NewReader("   \n"), &out, io.Discard, fixtureCities(), noLookupFetcher(t))
 	if code != 0 {
 		t.Fatalf("runInteractive exit = %d, want 0", code)
 	}
@@ -139,7 +151,7 @@ func TestRunInteractive_EmptyInput(t *testing.T) {
 // matches shows a clear message and re-prompts.
 func TestRunInteractive_NoMatch(t *testing.T) {
 	var out bytes.Buffer
-	code := runInteractive(strings.NewReader("zzzzzz\n"), &out, fixtureCities())
+	code := runInteractive(strings.NewReader("zzzzzz\n"), &out, io.Discard, fixtureCities(), noLookupFetcher(t))
 	if code != 0 {
 		t.Fatalf("runInteractive exit = %d, want 0", code)
 	}
@@ -158,7 +170,7 @@ func TestRunInteractive_NoMatch(t *testing.T) {
 // them, then a closing message and a 0 exit on the exit keyword.
 func TestRunInteractive_MultipleSearches(t *testing.T) {
 	var out bytes.Buffer
-	code := runInteractive(strings.NewReader("London\nParis\nexit\n"), &out, fixtureCities())
+	code := runInteractive(strings.NewReader("London\nParis\nexit\n"), &out, io.Discard, fixtureCities(), noLookupFetcher(t))
 	if code != 0 {
 		t.Fatalf("runInteractive exit = %d, want 0", code)
 	}
@@ -191,7 +203,7 @@ func TestRunInteractive_ExitKeywords(t *testing.T) {
 	for _, input := range []string{"exit\n", "quit\n", "EXIT\n", "Quit\n", "  exit  \n"} {
 		t.Run(strings.TrimSpace(input), func(t *testing.T) {
 			var out bytes.Buffer
-			code := runInteractive(strings.NewReader(input), &out, fixtureCities())
+			code := runInteractive(strings.NewReader(input), &out, io.Discard, fixtureCities(), noLookupFetcher(t))
 			if code != 0 {
 				t.Fatalf("runInteractive(%q) exit = %d, want 0", input, code)
 			}
@@ -210,7 +222,7 @@ func TestRunInteractive_ExitKeywords(t *testing.T) {
 // end-of-input (Ctrl+D) prints the closing message and returns 0.
 func TestRunInteractive_EOFClosesCleanly(t *testing.T) {
 	var out bytes.Buffer
-	code := runInteractive(strings.NewReader("London\n"), &out, fixtureCities())
+	code := runInteractive(strings.NewReader("London\n"), &out, io.Discard, fixtureCities(), noLookupFetcher(t))
 	if code != 0 {
 		t.Fatalf("runInteractive exit = %d, want 0", code)
 	}
@@ -218,3 +230,104 @@ func TestRunInteractive_EOFClosesCleanly(t *testing.T) {
 		t.Errorf("output = %q, want a closing message on EOF", got)
 	}
 }
+
+// fixedFetcher returns the same recorded SPARQL JSON for any query.
+func fixedFetcher(body string) func(context.Context, string) ([]byte, error) {
+	return func(context.Context, string) ([]byte, error) {
+		return []byte(body), nil
+	}
+}
+
+const parisAttractionsJSON = `{"results":{"bindings":[
+	{"itemLabel":{"value":"Eiffel Tower"},"typeLabel":{"value":"tower"},"sitelinks":{"value":"196"}},
+	{"itemLabel":{"value":"Louvre"},"typeLabel":{"value":"art museum"},"sitelinks":{"value":"168"}}
+]}}`
+
+const emptyAttractionsJSON = `{"results":{"bindings":[]}}`
+
+// TestRunInteractive_SelectionShowsAttractions covers contract scenario A1
+// (FR-001, FR-003, FR-005): after a search, selecting a city by its number
+// renders that city's ranked, numbered attractions.
+func TestRunInteractive_SelectionShowsAttractions(t *testing.T) {
+	var out, errOut bytes.Buffer
+	code := runInteractive(strings.NewReader("Paris\n1\nexit\n"), &out, &errOut, fixtureCities(), fixedFetcher(parisAttractionsJSON))
+	if code != 0 {
+		t.Fatalf("runInteractive exit = %d, want 0", code)
+	}
+	got := out.String()
+	if !strings.Contains(got, "Top attractions in Paris, France:") {
+		t.Errorf("output = %q, want the attractions heading", got)
+	}
+	for _, want := range []string{"Eiffel Tower — tower", "Louvre — art museum"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("output = %q, want attraction line %q", got, want)
+		}
+	}
+	// The most-known attraction (highest sitelinks) ranks first.
+	if ei, lo := strings.Index(got, "Eiffel Tower"), strings.Index(got, "Louvre"); ei < 0 || lo < 0 || ei > lo {
+		t.Errorf("Eiffel Tower should rank before Louvre; got %q", got)
+	}
+	if errOut.Len() != 0 {
+		t.Errorf("stderr = %q, want empty on success", errOut.String())
+	}
+}
+
+// TestRunInteractive_InvalidSelection covers contract scenario A5 (FR-008): a
+// number outside the result list is rejected with a clear message and no lookup
+// is attempted.
+func TestRunInteractive_InvalidSelection(t *testing.T) {
+	var out, errOut bytes.Buffer
+	// fixtureCities has 2 Paris matches; 9 is out of range.
+	code := runInteractive(strings.NewReader("Paris\n9\nexit\n"), &out, &errOut, fixtureCities(), noLookupFetcher(t))
+	if code != 0 {
+		t.Fatalf("runInteractive exit = %d, want 0", code)
+	}
+	got := out.String()
+	if !strings.Contains(got, "is not a valid selection") {
+		t.Errorf("output = %q, want an invalid-selection message", got)
+	}
+	if strings.Contains(got, "Top attractions") {
+		t.Errorf("output = %q, want no attractions rendered for an invalid selection", got)
+	}
+}
+
+// TestRunInteractive_NoAttractions covers contract scenario A4 (FR-006): a valid
+// selection that finds nothing yields a clear message and the session continues
+// (exit 0).
+func TestRunInteractive_NoAttractions(t *testing.T) {
+	var out, errOut bytes.Buffer
+	code := runInteractive(strings.NewReader("Paris\n1\nexit\n"), &out, &errOut, fixtureCities(), fixedFetcher(emptyAttractionsJSON))
+	if code != 0 {
+		t.Fatalf("runInteractive exit = %d, want 0", code)
+	}
+	got := out.String()
+	if !strings.Contains(got, "No attractions found for Paris, France.") {
+		t.Errorf("output = %q, want the no-attractions message", got)
+	}
+}
+
+// TestRunInteractive_FetchError covers contract scenario A7 (FR-009): a
+// source/connectivity failure is reported on stderr and exits non-zero.
+func TestRunInteractive_FetchError(t *testing.T) {
+	var out, errOut bytes.Buffer
+	failing := func(context.Context, string) ([]byte, error) {
+		return nil, errFetch
+	}
+	code := runInteractive(strings.NewReader("Paris\n1\n"), &out, &errOut, fixtureCities(), failing)
+	if code != 2 {
+		t.Fatalf("runInteractive exit = %d, want 2 on fetch error", code)
+	}
+	if !strings.Contains(errOut.String(), "unable to fetch attractions") {
+		t.Errorf("stderr = %q, want the fetch-error message", errOut.String())
+	}
+	if strings.Contains(out.String(), "Top attractions") {
+		t.Errorf("stdout = %q, want no attractions on a fetch error", out.String())
+	}
+}
+
+// errFetch is a sentinel error for the fetch-error scenario.
+var errFetch = errorString("connection refused")
+
+type errorString string
+
+func (e errorString) Error() string { return string(e) }

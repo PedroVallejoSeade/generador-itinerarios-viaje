@@ -57,6 +57,17 @@ confirming a plausible top-10 attractions list is returned from Wikidata — est
 feasibility in Go (SC-007). A recorded response of this query is the test fixture that keeps the
 PoC reproducible offline.
 
+Run the PoC deterministically (no network) in under a minute:
+
+```bash
+go test ./internal/attraction/ -run TestLookup_FromGoldenFixture -v
+```
+
+This drives the full `fetch → decode → map → rank → cap` path (`attraction.Lookup`) against the
+recorded `internal/attraction/testdata/paris.json` response, asserting a ranked list led by the
+most-known landmark. The same logic powers the live CLI path (step 1 above) when network access
+is available, confirming the recommendation in [research.md](research.md) is feasible.
+
 ## Success Criteria Validation
 
 | Criterion | How to verify |

@@ -30,9 +30,9 @@ code lives under `internal/attraction/`; CLI wiring extends `cmd/citysearch/`. T
 
 **Purpose**: Create the new package skeleton and test-fixture location used by both stories.
 
-- [ ] T001 Create the `internal/attraction/` package directory with a package doc comment in internal/attraction/attraction.go (package `attraction`)
-- [ ] T002 [P] Create the test-fixtures directory internal/attraction/testdata/ with a placeholder .gitkeep so recorded WDQS JSON responses have a home
-- [ ] T003 [P] Verify the toolchain builds the empty package: run `go build ./...` and `go vet ./...` from the repo root
+- [x] T001 Create the `internal/attraction/` package directory with a package doc comment in internal/attraction/attraction.go (package `attraction`)
+- [x] T002 [P] Create the test-fixtures directory internal/attraction/testdata/ with a placeholder .gitkeep so recorded WDQS JSON responses have a home
+- [x] T003 [P] Verify the toolchain builds the empty package: run `go build ./...` and `go vet ./...` from the repo root
 
 ---
 
@@ -42,9 +42,9 @@ code lives under `internal/attraction/`; CLI wiring extends `cmd/citysearch/`. T
 
 **⚠️ CRITICAL**: No user story implementation can begin until this phase is complete.
 
-- [ ] T004 [P] Define the `Attraction` value type (`Name`, `Category`, `Description`, `Prominence int`) per data-model.md in internal/attraction/attraction.go
-- [ ] T005 [P] Define the `CitySelection` type (`Index int`, `Name`, `Country`, `Region`) and a constructor that maps a chosen `city.City` + 1-based index, per data-model.md, in internal/attraction/selection.go
-- [ ] T006 Define the fetcher seam — a `Fetcher` function/interface type `func(ctx context.Context, query string) ([]byte, error)` — and a default `net/http` HTTPS implementation (with User-Agent) in internal/attraction/wikidata.go
+- [x] T004 [P] Define the `Attraction` value type (`Name`, `Category`, `Description`, `Prominence int`) per data-model.md in internal/attraction/attraction.go
+- [x] T005 [P] Define the `CitySelection` type (`Index int`, `Name`, `Country`, `Region`) and a constructor that maps a chosen `city.City` + 1-based index, per data-model.md, in internal/attraction/selection.go
+- [x] T006 Define the fetcher seam — a `Fetcher` function/interface type `func(ctx context.Context, query string) ([]byte, error)` — and a default `net/http` HTTPS implementation (with User-Agent) in internal/attraction/wikidata.go
 
 **Checkpoint**: Types and fetch seam exist — both user stories can now proceed.
 
@@ -58,22 +58,22 @@ code lives under `internal/attraction/`; CLI wiring extends `cmd/citysearch/`. T
 
 ### Tests for User Story 1 (write first, ensure they FAIL) ⚠️
 
-- [ ] T007 [P] [US1] Record a real WDQS SPARQL JSON response for a well-known city (e.g. Paris) into internal/attraction/testdata/paris.json as the golden ranking/mapping fixture
-- [ ] T008 [P] [US1] Add a >10-result fixture internal/attraction/testdata/many.json and an empty-result fixture internal/attraction/testdata/empty.json for cap and no-attractions tests
-- [ ] T009 [P] [US1] Table-driven test for JSON→`Attraction` mapping (name, category, description, prominence) over golden fixtures in internal/attraction/attraction_test.go
-- [ ] T010 [P] [US1] Table-driven test for prominence ranking (descending sitelink count, ascending name tiebreaker) and the 10-result cap in internal/attraction/attraction_test.go
-- [ ] T011 [P] [US1] Test the <10 "show all" path and the empty "no attractions found" path in internal/attraction/attraction_test.go
-- [ ] T012 [P] [US1] Test the fetch-error path (fetcher returns an error → wrapped error, not an empty set) in internal/attraction/wikidata_test.go
-- [ ] T013 [P] [US1] Scripted CLI test for selection→attractions rendering, invalid selection (no lookup), no-attractions message, and fetch-error path in cmd/citysearch/interactive_test.go
+- [x] T007 [P] [US1] Record a real WDQS SPARQL JSON response for a well-known city (e.g. Paris) into internal/attraction/testdata/paris.json as the golden ranking/mapping fixture
+- [x] T008 [P] [US1] Add a >10-result fixture internal/attraction/testdata/many.json and an empty-result fixture internal/attraction/testdata/empty.json for cap and no-attractions tests
+- [x] T009 [P] [US1] Table-driven test for JSON→`Attraction` mapping (name, category, description, prominence) over golden fixtures in internal/attraction/attraction_test.go
+- [x] T010 [P] [US1] Table-driven test for prominence ranking (descending sitelink count, ascending name tiebreaker) and the 10-result cap in internal/attraction/attraction_test.go
+- [x] T011 [P] [US1] Test the <10 "show all" path and the empty "no attractions found" path in internal/attraction/attraction_test.go
+- [x] T012 [P] [US1] Test the fetch-error path (fetcher returns an error → wrapped error, not an empty set) in internal/attraction/wikidata_test.go
+- [x] T013 [P] [US1] Scripted CLI test for selection→attractions rendering, invalid selection (no lookup), no-attractions message, and fetch-error path in cmd/citysearch/interactive_test.go
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Implement the SPARQL query builder (city resolved by name + country, accent/Unicode-safe per FR-002a) and JSON-results parsing in internal/attraction/wikidata.go (depends on T006)
-- [ ] T015 [US1] Implement JSON→`Attraction` mapping (skip empty-name bindings, default `Prominence` to 0) in internal/attraction/attraction.go (depends on T004)
-- [ ] T016 [US1] Implement prominence ranking + 10-cap (`func Rank([]Attraction) []Attraction` / result-set builder) per data-model.md ordering rules in internal/attraction/attraction.go (depends on T015)
-- [ ] T017 [US1] Implement the top-level lookup `func Lookup(ctx, fetcher, CitySelection) ([]Attraction, error)` tying fetch → parse → map → rank → cap in internal/attraction/attraction.go (depends on T014, T016)
-- [ ] T018 [US1] Extend `runInteractive` to prompt for a city number after listing matches, validate the selection (reject out-of-range without a lookup, FR-008), and on a valid pick call `attraction.Lookup` in cmd/citysearch/interactive.go (depends on T017)
-- [ ] T019 [US1] Render the numbered attractions list to stdout (name + category/description when present, FR-005), the "No attractions found for …" message (FR-006), and report source/connectivity errors on stderr with non-zero exit (FR-009) in cmd/citysearch/interactive.go (depends on T018)
+- [x] T014 [US1] Implement the SPARQL query builder (city resolved by name + country, accent/Unicode-safe per FR-002a) and JSON-results parsing in internal/attraction/wikidata.go (depends on T006)
+- [x] T015 [US1] Implement JSON→`Attraction` mapping (skip empty-name bindings, default `Prominence` to 0) in internal/attraction/attraction.go (depends on T004)
+- [x] T016 [US1] Implement prominence ranking + 10-cap (`func Rank([]Attraction) []Attraction` / result-set builder) per data-model.md ordering rules in internal/attraction/attraction.go (depends on T015)
+- [x] T017 [US1] Implement the top-level lookup `func Lookup(ctx, fetcher, CitySelection) ([]Attraction, error)` tying fetch → parse → map → rank → cap in internal/attraction/attraction.go (depends on T014, T016)
+- [x] T018 [US1] Extend `runInteractive` to prompt for a city number after listing matches, validate the selection (reject out-of-range without a lookup, FR-008), and on a valid pick call `attraction.Lookup` in cmd/citysearch/interactive.go (depends on T017)
+- [x] T019 [US1] Render the numbered attractions list to stdout (name + category/description when present, FR-005), the "No attractions found for …" message (FR-006), and report source/connectivity errors on stderr with non-zero exit (FR-009) in cmd/citysearch/interactive.go (depends on T018)
 
 **Checkpoint**: User Story 1 is fully functional — selecting a city displays its ranked top-10 attractions, with all edge cases handled and tests green.
 
@@ -87,10 +87,10 @@ code lives under `internal/attraction/`; CLI wiring extends `cmd/citysearch/`. T
 
 > Note: the findings document already exists at [research.md](research.md). The tasks below verify it satisfies FR-012/FR-013 and bind the proof of concept (FR-014) to a reproducible artifact.
 
-- [ ] T020 [P] [US2] Verify research.md evaluates ≥ 3 candidates (WDQS, OpenTripMap, Overpass/OSM) against all five criteria — data quality, Go integration, auth, rate limits, relevance (FR-012) — and update if any criterion is missing
-- [ ] T021 [P] [US2] Verify research.md states a single recommended approach (WDQS SPARQL) with rationale and identified risks/limitations (FR-013); fill gaps if present
-- [ ] T022 [US2] Provide the proof of concept (FR-014): a reproducible sample-city lookup demonstrating the recommended approach returns a plausible attractions list — wired via the T007 golden fixture so the PoC is runnable offline through `go test` (depends on T007, T017)
-- [ ] T023 [US2] Cross-link the PoC and recommendation in quickstart.md "Proof of Concept" / "Spike Wrap-Up" sections so a reviewer can confirm feasibility in < 5 minutes (SC-006, SC-007)
+- [x] T020 [P] [US2] Verify research.md evaluates ≥ 3 candidates (WDQS, OpenTripMap, Overpass/OSM) against all five criteria — data quality, Go integration, auth, rate limits, relevance (FR-012) — and update if any criterion is missing
+- [x] T021 [P] [US2] Verify research.md states a single recommended approach (WDQS SPARQL) with rationale and identified risks/limitations (FR-013); fill gaps if present
+- [x] T022 [US2] Provide the proof of concept (FR-014): a reproducible sample-city lookup demonstrating the recommended approach returns a plausible attractions list — wired via the T007 golden fixture so the PoC is runnable offline through `go test` (depends on T007, T017)
+- [x] T023 [US2] Cross-link the PoC and recommendation in quickstart.md "Proof of Concept" / "Spike Wrap-Up" sections so a reviewer can confirm feasibility in < 5 minutes (SC-006, SC-007)
 
 **Checkpoint**: The spike's documented recommendation and proof of concept are complete and verifiable.
 
@@ -100,10 +100,10 @@ code lives under `internal/attraction/`; CLI wiring extends `cmd/citysearch/`. T
 
 **Purpose**: Final validation and cleanup across both stories.
 
-- [ ] T024 [P] Run `gofmt -l` and `go vet ./...` across the repo; resolve any findings
-- [ ] T025 [P] Confirm full suite passes offline with `go test ./...` (no live network in tests)
-- [ ] T026 Walk through quickstart.md steps 1–7 against the built binary (`bin/citysearch`), confirming each maps to its contract scenario (A1–A7) and exit codes
-- [ ] T027 Remove disposable spike scaffolding (placeholder .gitkeep, dead exploratory code) per Constitution Principle III, keeping the durable client + fixtures
+- [x] T024 [P] Run `gofmt -l` and `go vet ./...` across the repo; resolve any findings
+- [x] T025 [P] Confirm full suite passes offline with `go test ./...` (no live network in tests)
+- [x] T026 Walk through quickstart.md steps 1–7 against the built binary (`bin/citysearch`), confirming each maps to its contract scenario (A1–A7) and exit codes
+- [x] T027 Remove disposable spike scaffolding (placeholder .gitkeep, dead exploratory code) per Constitution Principle III, keeping the durable client + fixtures
 
 ---
 

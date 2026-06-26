@@ -19,6 +19,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/PedroVallejoSeade/generador-itinerarios-viaje/internal/attraction"
 	"github.com/PedroVallejoSeade/generador-itinerarios-viaje/internal/city"
 )
 
@@ -77,7 +78,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 			fmt.Fprintf(stderr, "error: unable to load city data: %v\n", err)
 			return 2
 		}
-		return runInteractive(stdin, stdout, cities)
+		return runInteractive(stdin, stdout, stderr, cities, attraction.DefaultFetcher)
 	}
 
 	query := fs.Arg(0)

@@ -1,0 +1,14 @@
+{
+  "head": { "vars": ["itemLabel", "typeLabel", "itemDescription", "sitelinks"] },
+  "results": {
+    "bindings": [
+      { "itemLabel": { "value": "Louvre" }, "typeLabel": { "value": "art museum" }, "itemDescription": { "value": "Art museum in Paris, France" }, "sitelinks": { "value": "168" } },
+      { "itemLabel": { "value": "Eiffel Tower" }, "typeLabel": { "value": "tower" }, "itemDescription": { "value": "Tower located on the Champ de Mars in Paris, France" }, "sitelinks": { "value": "196" } },
+      { "itemLabel": { "value": "Notre-Dame de Paris" }, "typeLabel": { "value": "cathedral" }, "itemDescription": { "value": "Medieval Catholic cathedral in Paris, France" }, "sitelinks": { "value": "152" } },
+      { "itemLabel": { "value": "Arc de Triomphe" }, "typeLabel": { "value": "triumphal arch" }, "itemDescription": { "value": "Triumphal arch in Paris, France" }, "sitelinks": { "value": "118" } },
+      { "itemLabel": { "value": "Sacré-Cœur, Paris" }, "typeLabel": { "value": "minor basilica" }, "itemDescription": { "value": "Roman Catholic church and minor basilica in Paris" }, "sitelinks": { "value": "96" } },
+      { "itemLabel": { "value": "Panthéon" }, "typeLabel": { "value": "mausoleum" }, "itemDescription": { "value": "Mausoleum and former church in Paris" }, "sitelinks": { "value": "88" } },
+      { "itemLabel": { "value": "Musée d'Orsay" }, "typeLabel": { "value": "art museum" }, "itemDescription": { "value": "Museum in Paris, on the left bank of the Seine" }, "sitelinks": { "value": "84" } }
+    ]
+  }
+}
