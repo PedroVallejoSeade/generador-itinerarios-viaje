@@ -8,6 +8,14 @@
 
 **Input**: User description: "City Attractions Lookup Spike — As a traveler who has selected a city from the search results I want to see the top 10 most known attractions for that city so that I can discover the must-see sights, museums, and landmarks for my chosen destination. After the user selects a city by entering its number from the search results, the application should display the top 10 most famous attractions for that city (landmarks, museums, sightseeing spots). This is a spike to research and evaluate the best tool to power this feature: a free no-auth public API (preferred), a Go library, or an open dataset queried locally. Evaluate each option on data quality, ease of integration in Go, authentication requirements, rate limits, and result relevance, and document the recommended approach with a brief proof of concept."
 
+## Clarifications
+
+### Session 2026-06-26
+
+- Q: Must the attractions lookup work fully offline, or is network connectivity acceptable? → A: Network access is acceptable; the recommended source MAY require internet connectivity (e.g., a public API).
+- Q: Which identity should the attractions lookup use to resolve the selected city? → A: Resolve by name + country (plus region/state when available) to disambiguate same-named cities.
+- Q: What detail should be displayed per attraction? → A: Numbered list of attraction names, plus category/short description when readily available from the source.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See top attractions for a selected city (Priority: P1)
@@ -57,9 +65,10 @@ As the team building the itinerary generator, we need a documented evaluation of
 
 - **FR-001**: System MUST accept the user's selection of a city by its number from the previously displayed search results.
 - **FR-002**: System MUST look up attractions for the selected city using the chosen attraction data source.
+- **FR-002a**: System MUST resolve the selected city for the attractions lookup using its name plus country (and region/state when available) to disambiguate same-named cities, and MUST correctly handle accented or non-Latin city names.
 - **FR-003**: System MUST return a list of attractions for the selected city, ranked so the most well-known attractions appear first.
 - **FR-004**: System MUST limit the displayed attractions to a maximum of 10 (the top 10 most well-known) when more are available.
-- **FR-005**: System MUST present the attractions as human-readable text on standard output.
+- **FR-005**: System MUST present the attractions as human-readable text on standard output, formatted as a numbered list of attraction names, including a category and/or short description for an attraction when that supporting context is readily available from the chosen source.
 - **FR-006**: System MUST display a clear, explanatory message when no attractions are found for the selected city.
 - **FR-007**: System MUST display all available attractions when a city has fewer than 10, without error.
 - **FR-008**: System MUST reject an invalid city selection (a number not present in the result list) with a clear message and without performing a lookup.
@@ -72,7 +81,7 @@ As the team building the itinerary generator, we need a documented evaluation of
 
 ### Key Entities *(include if feature involves data)*
 
-- **City Selection**: The city the user chose from the search results, identified by its position/number in that list. Carries enough identity (name, country, region/state) to resolve the correct city for the attractions lookup.
+- **City Selection**: The city the user chose from the search results, identified by its position/number in that list. Carries enough identity (name, country, and region/state when available) to resolve the correct city for the attractions lookup; resolution is keyed on name + country (plus region/state when available) to disambiguate same-named cities.
 - **Attraction**: A notable place to visit in a city — a landmark, museum, or sightseeing spot. Key attributes: name and a measure of prominence/popularity used for ranking. May carry optional supporting context (category, short description, location) where readily available.
 - **Attraction Result Set**: The ordered collection of attractions returned for a selected city, ranked by prominence and bounded to a maximum display size of 10.
 
@@ -93,7 +102,7 @@ As the team building the itinerary generator, we need a documented evaluation of
 - **Trigger**: The attractions lookup begins after the city-selection step (entering a number from the search results) introduced by the prior interactive city-search feature; this spike assumes that selection mechanism already exists and produces a resolvable city.
 - **Ranking basis**: "Top 10 most known" is interpreted as ranking attractions by a prominence/popularity signal available from the chosen source (for example, number of reviews, ratings, or a built-in popularity rank); the exact signal depends on the source selected during the spike.
 - **Attraction types**: Landmarks, museums, and sightseeing spots are all in scope; restaurants, hotels, and other non-sightseeing categories are out of scope for this spike.
-- **Data source type**: A free no-authentication public API is preferred per Simplicity First, but a Go library or a bundled/local open dataset is acceptable if it better satisfies data quality and relevance; the spike determines the best fit.
+- **Data source type**: A free no-authentication public API is preferred per Simplicity First, but a Go library or a bundled/local open dataset is acceptable if it better satisfies data quality and relevance; the spike determines the best fit. Network/internet connectivity is acceptable: the recommended source MAY require online access (full offline operation is not a requirement).
 - **Result cap**: The application displays at most 10 attractions to keep terminal output readable.
 - **Scope boundary**: Building a full itinerary, persisting selected attractions, mapping/routing between attractions, and any booking functionality are out of scope for this spike — its scope ends at returning and displaying the top attractions plus the data-source recommendation and proof of concept.
 - **Interface**: Interaction is terminal/CLI-based with text input and output, consistent with the project's CLI Interface principle.
