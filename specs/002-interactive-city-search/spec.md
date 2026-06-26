@@ -8,6 +8,14 @@
 
 **Input**: User description: "Interactive City Search CLI — When the user launches the application, they should be greeted with a welcome message that sets the tone for the travel itinerary generator. The terminal then prompts the user to enter a city name. Once the user types a city name and presses Enter, the application queries the city database and displays the top 10 matching cities with their country and region, formatted in a clean, readable way. This transforms the current one-shot CLI command into an interactive terminal experience."
 
+## Clarifications
+
+### Session 2026-06-26
+
+- Q: Which exit actions should end an interactive session? → A: Recognize `exit` and `quit` (case-insensitive, full-line match), plus Ctrl+D / end-of-input.
+- Q: Should the UI advertise how to exit and that searching can repeat? → A: Yes — the welcome/prompt includes a short exit hint (e.g., "type 'exit' or press Ctrl+D to quit"); repeated search is implied by the prompt re-appearing.
+- Q: Should the interactive result list be numbered? → A: Yes — prefix each result with a 1-based index (e.g., "1. London, England, United Kingdom"), keeping the existing Name, Region, Country content.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Guided interactive city search (Priority: P1)
@@ -21,7 +29,7 @@ A traveler launches the application without supplying any arguments. They are gr
 **Acceptance Scenarios**:
 
 1. **Given** the application is launched with no city argument, **When** it starts, **Then** a welcome message and a prompt to enter a city name are displayed before any input is read.
-2. **Given** the prompt is shown, **When** the user types a valid city name and presses Enter, **Then** up to 10 matching cities are displayed, ordered with the most relevant (largest) first, each formatted as name, region, and country on its own line.
+2. **Given** the prompt is shown, **When** the user types a valid city name and presses Enter, **Then** up to 10 matching cities are displayed, ordered with the most relevant (largest) first, each on its own line prefixed with a 1-based index and formatted as name, region, and country.
 3. **Given** the user enters a city name that has fewer than 10 matches, **When** results are shown, **Then** only the actual matches are displayed without padding or placeholder rows.
 4. **Given** a matching city has no known region, **When** it is displayed, **Then** the region is omitted gracefully and the line remains readable.
 
@@ -73,15 +81,16 @@ After viewing results for one city, a traveler can immediately search for anothe
 
 - **FR-001**: On launch with no city provided as an argument, the application MUST display a welcome message that introduces the travel itinerary tool before reading any input.
 - **FR-002**: After the welcome message, the application MUST display a prompt inviting the user to enter a city name.
+- **FR-002a**: The welcome message or prompt MUST include a brief hint on how to exit (e.g., "type 'exit' or press Ctrl+D to quit"); the ability to search again is conveyed by the prompt re-appearing after each result.
 - **FR-003**: The application MUST read a full line of user input as the city query after the prompt.
 - **FR-004**: The application MUST trim surrounding whitespace from the entered query before searching.
 - **FR-005**: The application MUST match cities by name using case-insensitive matching, consistent with the existing search behavior.
 - **FR-006**: The application MUST display at most 10 matching cities for a query, ordered most-relevant first (largest population first, consistent with existing search ranking).
-- **FR-007**: Each displayed city MUST show its name, region, and country in a clean, readable single-line format, omitting the region when it is unknown.
+- **FR-007**: Each displayed city MUST show its name, region, and country in a clean, readable single-line format prefixed with a 1-based index (e.g., "1. London, England, United Kingdom"), omitting the region when it is unknown.
 - **FR-008**: When the entered query is empty or whitespace-only, the application MUST display a friendly message asking for a city name and MUST NOT perform a search for that input.
 - **FR-009**: When a query produces no matches, the application MUST display a clear message indicating no cities were found for that query.
 - **FR-010**: The application MUST allow the user to perform another search after results (or a no-match/empty message) are shown, without relaunching.
-- **FR-011**: The application MUST provide a clear way to end the session (an exit keyword and/or end-of-input signal) and MUST display a brief closing message on exit.
+- **FR-011**: The application MUST end the session when the user enters `exit` or `quit` (matched case-insensitively against the full trimmed input line) or signals end-of-input (Ctrl+D), and MUST display a brief closing message on exit.
 - **FR-012**: On a clean exit, the application MUST terminate with a success status code; on a data-load failure it MUST terminate with a non-zero status code and a clear error message.
 - **FR-013**: When the application is invoked with a city name argument (existing one-shot usage), it MUST continue to behave as a single-query lookup and MUST NOT enter interactive mode.
 
@@ -96,7 +105,7 @@ After viewing results for one city, a traveler can immediately search for anothe
 ### Measurable Outcomes
 
 - **SC-001**: A first-time user, given no instructions, can launch the app and successfully see matching cities for a destination within their first interaction, guided solely by the on-screen welcome and prompt.
-- **SC-002**: Every search for a name with matches returns results, capped at 10 cities, each line clearly showing name, region (when present), and country.
+- **SC-002**: Every search for a name with matches returns results, capped at 10 cities, each line prefixed with a 1-based index and clearly showing name, region (when present), and country.
 - **SC-003**: Empty input and no-match scenarios always produce a friendly, understandable message and never crash or leave the user without guidance.
 - **SC-004**: A user can complete searches for at least two different destinations in a single session and then exit cleanly without relaunching the application.
 - **SC-005**: Search results for any single query are displayed effectively instantly from the user's perspective (no perceptible wait).
@@ -106,6 +115,6 @@ After viewing results for one city, a traveler can immediately search for anothe
 - The interactive experience is triggered when the application is launched without a city-name argument; supplying a city name preserves the existing one-shot lookup behavior (FR-013).
 - The city dataset, matching rules (case-insensitive prefix match), ranking (by population, largest first), and 10-result cap are reused from the existing search implementation rather than redefined.
 - The entire input line typed at the prompt is treated as the city query, so multi-word city names do not require quoting.
-- "Clean, readable format" reuses the existing single-line "Name, Region, Country" rendering (region omitted when unknown) for visual consistency with the current tool.
-- Session continuation (multiple searches per launch) and an exit mechanism are in scope as a P3 enhancement; recognized exit actions include an exit keyword (e.g. "exit"/"quit") and an end-of-input (Ctrl+D) signal.
+- "Clean, readable format" reuses the existing single-line "Name, Region, Country" rendering (region omitted when unknown) for visual consistency with the current tool, adding a 1-based index prefix per line for the interactive list.
+- Session continuation (multiple searches per launch) and an exit mechanism are in scope as a P3 enhancement; recognized exit actions are the keywords `exit` and `quit` (matched case-insensitively against the full trimmed input line) and an end-of-input (Ctrl+D) signal.
 - Input and output occur over a standard terminal (stdin/stdout), with errors reported to the standard error stream, consistent with the project's CLI principles.
