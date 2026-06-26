@@ -15,10 +15,36 @@ go build -o bin/citysearch ./cmd/citysearch
 make build
 ```
 
+### Run (interactive mode)
+
+Build, then launch with **no argument** to start the guided interactive session:
+
+```bash
+go build -o bin/citysearch ./cmd/citysearch
+./bin/citysearch
+```
+
+You get a welcome message, an exit hint, and a `city>` prompt. Type a city name
+and press Enter to see up to 10 numbered matches; keep searching, then type
+`exit`/`quit` or press Ctrl+D to leave.
+
+```text
+Welcome to the Travel Itinerary Generator!
+Enter a city name to find matching destinations.
+(type 'exit' or press Ctrl+D to quit)
+city> london
+1. London, England, United Kingdom
+2. London, Ontario, Canada
+...
+city> exit
+Goodbye! Safe travels.
+```
+
 ### Usage
 
 ```bash
-citysearch <city-name>
+citysearch              # interactive mode (no argument)
+citysearch <city-name>  # one-shot mode: single lookup, un-numbered output
 citysearch -h | --help
 ```
 
@@ -26,6 +52,8 @@ The city name is a positional argument; quote multi-word names
 (e.g. `citysearch "san jose"`).
 
 ### Examples
+
+One-shot mode (a positional argument) prints un-numbered matches:
 
 ```bash
 $ ./bin/citysearch paris
