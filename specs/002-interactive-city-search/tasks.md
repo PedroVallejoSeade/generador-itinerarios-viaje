@@ -29,8 +29,8 @@ description: "Task list for Interactive City Search CLI implementation"
 
 **Purpose**: Confirm the existing project builds and tests green before changing anything.
 
-- [ ] T001 Verify baseline builds and tests pass by running `go build ./...` and `go test ./...` from the repository root; record any pre-existing failures before starting.
-- [ ] T002 [P] Verify formatting/vet baseline by running `gofmt -l .` and `go vet ./...` from the repository root; the working tree must be clean before edits.
+- [X] T001 Verify baseline builds and tests pass by running `go build ./...` and `go test ./...` from the repository root; record any pre-existing failures before starting.
+- [X] T002 [P] Verify formatting/vet baseline by running `gofmt -l .` and `go vet ./...` from the repository root; the working tree must be clean before edits.
 
 ---
 
@@ -40,9 +40,9 @@ description: "Task list for Interactive City Search CLI implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Add `cmd/citysearch/main_test.go` (package `main`) with table-driven tests for the existing one-shot mode driven through `io.Writer` seams: assert stdout for a matching query (un-numbered `Name, Region, Country` lines, region omitted when empty), the no-match message, the empty/missing-argument usage error on stderr, and the data-load/exit-code contract (0 success, 1 invalid usage, 2 data-load failure per FR-013 / 001 contract). These tests MUST fail to compile/run first (Red).
-- [ ] T004 Refactor `run` in `cmd/citysearch/main.go` to accept `stdout io.Writer, stderr io.Writer` (replacing `*os.File`), update the `format` helper and all `fmt.Fprint*` call sites accordingly, and update `main()` to pass `os.Stdout`/`os.Stderr`; keep one-shot behavior identical so T003 passes (Green). Add the `io` import.
-- [ ] T005 Extend `run` in `cmd/citysearch/main.go` to also accept `stdin io.Reader` (wired from `os.Stdin` in `main()`), threading it through unused for now so the signature supports the interactive loop added in Phase 3; ensure T003 still passes.
+- [X] T003 Add `cmd/citysearch/main_test.go` (package `main`) with table-driven tests for the existing one-shot mode driven through `io.Writer` seams: assert stdout for a matching query (un-numbered `Name, Region, Country` lines, region omitted when empty), the no-match message, the empty/missing-argument usage error on stderr, and the data-load/exit-code contract (0 success, 1 invalid usage, 2 data-load failure per FR-013 / 001 contract). These tests MUST fail to compile/run first (Red).
+- [X] T004 Refactor `run` in `cmd/citysearch/main.go` to accept `stdout io.Writer, stderr io.Writer` (replacing `*os.File`), update the `format` helper and all `fmt.Fprint*` call sites accordingly, and update `main()` to pass `os.Stdout`/`os.Stderr`; keep one-shot behavior identical so T003 passes (Green). Add the `io` import.
+- [X] T005 Extend `run` in `cmd/citysearch/main.go` to also accept `stdin io.Reader` (wired from `os.Stdin` in `main()`), threading it through unused for now so the signature supports the interactive loop added in Phase 3; ensure T003 still passes.
 
 **Checkpoint**: Entry point exposes `io.Reader`/`io.Writer` seams; one-shot mode unchanged and fully tested. User stories can now begin.
 
@@ -56,12 +56,12 @@ description: "Task list for Interactive City Search CLI implementation"
 
 ### Tests for User Story 1 (write FIRST — must fail before implementation) ⚠️
 
-- [ ] T006 [P] [US1] Add table-driven tests in `cmd/citysearch/interactive_test.go` (package `main`) driving the interactive session through a scripted `strings.Reader` and a captured `bytes.Buffer`: cover I1 (welcome + exit hint + prompt emitted before any input is read — contract scenario I1 / FR-001, FR-002, FR-002a) and the numbered-results rendering for a known query, asserting 1-based index prefixes, ≤10 lines, population-descending order, and graceful region omission (FR-006, FR-007). Use `internal/city/testdata/cities_sample.csv` or a small in-memory `[]city.City` fixture for determinism. Tests MUST fail first (Red).
+- [X] T006 [P] [US1] Add table-driven tests in `cmd/citysearch/interactive_test.go` (package `main`) driving the interactive session through a scripted `strings.Reader` and a captured `bytes.Buffer`: cover I1 (welcome + exit hint + prompt emitted before any input is read — contract scenario I1 / FR-001, FR-002, FR-002a) and the numbered-results rendering for a known query, asserting 1-based index prefixes, ≤10 lines, population-descending order, and graceful region omission (FR-006, FR-007). Use `internal/city/testdata/cities_sample.csv` or a small in-memory `[]city.City` fixture for determinism. Tests MUST fail first (Red).
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Create `cmd/citysearch/interactive.go` (package `main`) with a `runInteractive(in io.Reader, out io.Writer, cities []city.City) int` session function that prints the welcome message + exit hint (FR-001, FR-002a), prints the prompt (FR-002), reads one full line via `bufio.NewScanner` (FR-003), trims it (FR-004), and for a non-empty query calls `city.Search` and renders results; loop terminates on scanner EOF returning 0. Add an `interactive` rendering helper producing `"<n>. <Name>, <Region>, <Country>"` (region-omitted form when empty) per FR-007.
-- [ ] T008 [US1] Wire mode selection in `run` (`cmd/citysearch/main.go`): when `fs.NArg() == 0`, load the dataset once via `city.Load()` (report load failure on stderr and return the data-load exit code before any prompt — FR-012), then call `runInteractive(stdin, stdout, cities)`; when an argument is present, keep the existing one-shot path (FR-013). Ensure T006 passes (Green).
+- [X] T007 [US1] Create `cmd/citysearch/interactive.go` (package `main`) with a `runInteractive(in io.Reader, out io.Writer, cities []city.City) int` session function that prints the welcome message + exit hint (FR-001, FR-002a), prints the prompt (FR-002), reads one full line via `bufio.NewScanner` (FR-003), trims it (FR-004), and for a non-empty query calls `city.Search` and renders results; loop terminates on scanner EOF returning 0. Add an `interactive` rendering helper producing `"<n>. <Name>, <Region>, <Country>"` (region-omitted form when empty) per FR-007.
+- [X] T008 [US1] Wire mode selection in `run` (`cmd/citysearch/main.go`): when `fs.NArg() == 0`, load the dataset once via `city.Load()` (report load failure on stderr and return the data-load exit code before any prompt — FR-012), then call `runInteractive(stdin, stdout, cities)`; when an argument is present, keep the existing one-shot path (FR-013). Ensure T006 passes (Green).
 
 **Checkpoint**: User Story 1 fully functional — guided welcome → prompt → numbered results works end-to-end and is independently testable.
 
@@ -75,11 +75,11 @@ description: "Task list for Interactive City Search CLI implementation"
 
 ### Tests for User Story 2 (write FIRST — must fail before implementation) ⚠️
 
-- [ ] T009 [P] [US2] Add table-driven cases to `cmd/citysearch/interactive_test.go` covering empty/whitespace-only input → friendly message + re-prompt with no search (FR-008, contract I5) and a no-match query → `No cities found matching "<query>".` + re-prompt (FR-009, contract I6). Tests MUST fail first (Red).
+- [X] T009 [P] [US2] Add table-driven cases to `cmd/citysearch/interactive_test.go` covering empty/whitespace-only input → friendly message + re-prompt with no search (FR-008, contract I5) and a no-match query → `No cities found matching "<query>".` + re-prompt (FR-009, contract I6). Tests MUST fail first (Red).
 
 ### Implementation for User Story 2
 
-- [ ] T010 [US2] Extend the input classification in `runInteractive` (`cmd/citysearch/interactive.go`) so that, after trimming, an empty string prints the friendly "Please enter a city name." message and re-prompts without calling `city.Search` (FR-008), and a query yielding zero results prints `No cities found matching "<query>".` then re-prompts (FR-009). Ensure T009 passes (Green).
+- [X] T010 [US2] Extend the input classification in `runInteractive` (`cmd/citysearch/interactive.go`) so that, after trimming, an empty string prints the friendly "Please enter a city name." message and re-prompts without calling `city.Search` (FR-008), and a query yielding zero results prints `No cities found matching "<query>".` then re-prompts (FR-009). Ensure T009 passes (Green).
 
 **Checkpoint**: User Stories 1 AND 2 both work independently — empty and no-match inputs are handled gracefully and the loop continues.
 
@@ -93,11 +93,11 @@ description: "Task list for Interactive City Search CLI implementation"
 
 ### Tests for User Story 3 (write FIRST — must fail before implementation) ⚠️
 
-- [ ] T011 [P] [US3] Add table-driven cases to `cmd/citysearch/interactive_test.go` covering: two sequential searches in one session with the prompt re-appearing between them (FR-010, contract I7); exit keyword recognition for `exit`/`quit` case-insensitively against the full trimmed line including `EXIT` (FR-011, contract I8); EOF/Ctrl+D clean close (contract I3); and that a closing message is printed and the function returns 0 on every exit path (FR-011, FR-012). Tests MUST fail first (Red).
+- [X] T011 [P] [US3] Add table-driven cases to `cmd/citysearch/interactive_test.go` covering: two sequential searches in one session with the prompt re-appearing between them (FR-010, contract I7); exit keyword recognition for `exit`/`quit` case-insensitively against the full trimmed line including `EXIT` (FR-011, contract I8); EOF/Ctrl+D clean close (contract I3); and that a closing message is printed and the function returns 0 on every exit path (FR-011, FR-012). Tests MUST fail first (Red).
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Complete the `runInteractive` loop (`cmd/citysearch/interactive.go`): classify a trimmed line as Exit when it equals `exit` or `quit` via `strings.EqualFold` (full-line match — FR-011) or when the scanner stops/EOF occurs, printing the brief closing message and returning 0; ensure the prompt is re-emitted after every empty, no-match, and results response so repeated searching works (FR-010). Ensure T011 passes (Green).
+- [X] T012 [US3] Complete the `runInteractive` loop (`cmd/citysearch/interactive.go`): classify a trimmed line as Exit when it equals `exit` or `quit` via `strings.EqualFold` (full-line match — FR-011) or when the scanner stops/EOF occurs, printing the brief closing message and returning 0; ensure the prompt is re-emitted after every empty, no-match, and results response so repeated searching works (FR-010). Ensure T011 passes (Green).
 
 **Checkpoint**: All three user stories independently functional — multi-search sessions and all clean-exit paths (keywords + EOF) work.
 
@@ -107,10 +107,10 @@ description: "Task list for Interactive City Search CLI implementation"
 
 **Purpose**: Final consistency, documentation, and full-suite validation across all stories.
 
-- [ ] T013 [P] Run `gofmt -w cmd/citysearch/` and `go vet ./...`; resolve any formatting or vet findings introduced by the new/edited files.
-- [ ] T014 Update `cmd/citysearch/main.go` package/usage doc comments to describe the two modes (interactive vs. one-shot) so `-h/--help` and source docs reflect FR-013 without changing one-shot output.
-- [ ] T015 Run the full suite `go test ./...` and confirm all `cmd/citysearch` and `internal/city` tests pass (Refactor step complete, no regressions).
-- [ ] T016 Execute the `quickstart.md` validation scenarios — including `printf 'london\n  \nzzzzzz\nquit\n' | ./bin/citysearch` and `printf 'london\nexit\n' | ./bin/citysearch; echo "exit=$?"` (expect `exit=0`) — and confirm outputs match contracts/cli.md scenarios I1–I10.
+- [X] T013 [P] Run `gofmt -w cmd/citysearch/` and `go vet ./...`; resolve any formatting or vet findings introduced by the new/edited files.
+- [X] T014 Update `cmd/citysearch/main.go` package/usage doc comments to describe the two modes (interactive vs. one-shot) so `-h/--help` and source docs reflect FR-013 without changing one-shot output.
+- [X] T015 Run the full suite `go test ./...` and confirm all `cmd/citysearch` and `internal/city` tests pass (Refactor step complete, no regressions).
+- [X] T016 Execute the `quickstart.md` validation scenarios — including `printf 'london\n  \nzzzzzz\nquit\n' | ./bin/citysearch` and `printf 'london\nexit\n' | ./bin/citysearch; echo "exit=$?"` (expect `exit=0`) — and confirm outputs match contracts/cli.md scenarios I1–I10.
 
 ---
 
