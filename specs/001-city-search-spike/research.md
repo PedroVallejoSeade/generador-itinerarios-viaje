@@ -67,3 +67,14 @@ Derived from the spec constraints:
 All Technical Context items are resolved; **no `NEEDS CLARIFICATION` markers remain**. The
 single open decision (data source) is now committed to the bundled SimpleMaps dataset, with
 GeoNames as a documented fallback.
+
+## Implementation Note (post-spike)
+
+During implementation the SimpleMaps Basic download endpoint required interactive access
+(returned HTTP 403 to scripted download), so the **documented GeoNames `cities15000` fallback
+(CC BY 4.0)** was bundled instead. The dump was converted into the same
+`city,country,admin_name,population` shape by joining `admin1CodesASCII.txt` (readable region)
+and `countryInfo.txt` (readable country), giving ~34k cities embedded via `//go:embed`. This
+validates the research conclusion: the fallback satisfies every constraint (no-auth, free,
+offline/fast, full disambiguation fields) with only a one-time build-step join. Attribution is
+credited to GeoNames in the README and `--help` output per the CC BY 4.0 obligation.

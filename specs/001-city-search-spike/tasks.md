@@ -30,9 +30,9 @@ description: "Task list for City Search Spike implementation"
 
 **Purpose**: Project skeleton and tooling
 
-- [ ] T001 Create the Go project directory structure (`cmd/citysearch/`, `internal/city/`, `internal/city/testdata/`) per [plan.md](plan.md)
-- [ ] T002 Verify `go.mod` targets Go 1.26 with module `github.com/PedroVallejoSeade/generador-itinerarios-viaje`; run `go build ./...` to confirm an empty buildable module
-- [ ] T003 [P] Add a `Makefile` (or document commands) for `gofmt`, `go vet`, and `go test ./...` at repository root
+- [X] T001 Create the Go project directory structure (`cmd/citysearch/`, `internal/city/`, `internal/city/testdata/`) per [plan.md](plan.md)
+- [X] T002 Verify `go.mod` targets Go 1.26 with module `github.com/PedroVallejoSeade/generador-itinerarios-viaje`; run `go build ./...` to confirm an empty buildable module
+- [X] T003 [P] Add a `Makefile` (or document commands) for `gofmt`, `go vet`, and `go test ./...` at repository root
 
 **Checkpoint**: Empty project compiles and tooling commands are available.
 
@@ -44,10 +44,10 @@ description: "Task list for City Search Spike implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Acquire the SimpleMaps World Cities (Basic, CC BY 4.0) dataset and place the CSV at `internal/city/cities.csv` (per [research.md](research.md))
-- [ ] T005 [P] Create a small deterministic test fixture at `internal/city/testdata/cities_sample.csv` containing entries for Paris (FR), several Springfields (US, different regions), São Paulo (BR), and London (multiple) to exercise matching, disambiguation, ranking, and accents
-- [ ] T006 Define the `City` struct (`Name`, `Country`, `Region`, `Population`) in `internal/city/city.go` per [data-model.md](data-model.md)
-- [ ] T007 Implement dataset loading via `//go:embed` and CSV parsing in `internal/city/city.go`, skipping rows with empty names and defaulting blank/non-numeric population to 0; return a clear error on parse failure (FR-009)
+- [X] T004 Acquire the SimpleMaps World Cities (Basic, CC BY 4.0) dataset and place the CSV at `internal/city/cities.csv` (per [research.md](research.md))
+- [X] T005 [P] Create a small deterministic test fixture at `internal/city/testdata/cities_sample.csv` containing entries for Paris (FR), several Springfields (US, different regions), São Paulo (BR), and London (multiple) to exercise matching, disambiguation, ranking, and accents
+- [X] T006 Define the `City` struct (`Name`, `Country`, `Region`, `Population`) in `internal/city/city.go` per [data-model.md](data-model.md)
+- [X] T007 Implement dataset loading via `//go:embed` and CSV parsing in `internal/city/city.go`, skipping rows with empty names and defaulting blank/non-numeric population to 0; return a clear error on parse failure (FR-009)
 
 **Checkpoint**: `City` records load in-memory from the embedded dataset; foundation ready for all stories.
 
@@ -61,15 +61,15 @@ description: "Task list for City Search Spike implementation"
 
 ### Tests for User Story 1 ⚠️ (write first, must FAIL before implementation)
 
-- [ ] T008 [P] [US1] Table-driven test for case-insensitive prefix matching (e.g., "par" → Paris; "PARIS" → Paris) against the fixture in `internal/city/search_test.go`
-- [ ] T009 [P] [US1] Table-driven test for empty/whitespace-only query rejection and for the no-results case in `internal/city/search_test.go`
+- [X] T008 [P] [US1] Table-driven test for case-insensitive prefix matching (e.g., "par" → Paris; "PARIS" → Paris) against the fixture in `internal/city/search_test.go`
+- [X] T009 [P] [US1] Table-driven test for empty/whitespace-only query rejection and for the no-results case in `internal/city/search_test.go`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Implement `SearchQuery` normalization (trim + lowercase) and empty-query rejection in `internal/city/search.go` per [data-model.md](data-model.md)
-- [ ] T011 [US1] Implement case-insensitive prefix matching returning matched `City` records in `internal/city/search.go` (FR-003)
-- [ ] T012 [US1] Implement the CLI entry point in `cmd/citysearch/main.go`: parse the positional argument, load data, run the search, print matches to stdout, and `-h/--help` usage text (FR-001, FR-005; [contracts/cli.md](contracts/cli.md))
-- [ ] T013 [US1] Wire exit codes and messages in `cmd/citysearch/main.go`: prompt + exit 1 on empty query (FR-008), "No cities found…" + exit 0 on no matches (FR-007), data-load error + exit 2 on failure (FR-009)
+- [X] T010 [US1] Implement `SearchQuery` normalization (trim + lowercase) and empty-query rejection in `internal/city/search.go` per [data-model.md](data-model.md)
+- [X] T011 [US1] Implement case-insensitive prefix matching returning matched `City` records in `internal/city/search.go` (FR-003)
+- [X] T012 [US1] Implement the CLI entry point in `cmd/citysearch/main.go`: parse the positional argument, load data, run the search, print matches to stdout, and `-h/--help` usage text (FR-001, FR-005; [contracts/cli.md](contracts/cli.md))
+- [X] T013 [US1] Wire exit codes and messages in `cmd/citysearch/main.go`: prompt + exit 1 on empty query (FR-008), "No cities found…" + exit 0 on no matches (FR-007), data-load error + exit 2 on failure (FR-009)
 
 **Checkpoint**: `citysearch <name>` returns matching cities — independently demonstrable MVP.
 
@@ -83,13 +83,13 @@ description: "Task list for City Search Spike implementation"
 
 ### Tests for User Story 2 ⚠️ (write first, must FAIL before implementation)
 
-- [ ] T014 [P] [US2] Table-driven test asserting each result exposes country and region, and that two same-name+same-country results differ by region, in `internal/city/search_test.go`
-- [ ] T015 [P] [US2] Table-driven test asserting population-descending ordering (name as tiebreaker) and the 10-result cap in `internal/city/search_test.go`
+- [X] T014 [P] [US2] Table-driven test asserting each result exposes country and region, and that two same-name+same-country results differ by region, in `internal/city/search_test.go`
+- [X] T015 [P] [US2] Table-driven test asserting population-descending ordering (name as tiebreaker) and the 10-result cap in `internal/city/search_test.go`
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Implement population-descending ranking with name tiebreaker and the max-10 truncation in `internal/city/search.go` (FR-006)
-- [ ] T017 [US2] Implement result formatting `"<Name>, <Region>, <Country>"` (omit region when empty) for stdout in `cmd/citysearch/main.go` (FR-004; [contracts/cli.md](contracts/cli.md))
+- [X] T016 [US2] Implement population-descending ranking with name tiebreaker and the max-10 truncation in `internal/city/search.go` (FR-006)
+- [X] T017 [US2] Implement result formatting `"<Name>, <Region>, <Country>"` (omit region when empty) for stdout in `cmd/citysearch/main.go` (FR-004; [contracts/cli.md](contracts/cli.md))
 
 **Checkpoint**: Same-name searches return ranked, capped, context-rich results — US1 and US2 both work.
 
@@ -103,8 +103,8 @@ description: "Task list for City Search Spike implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Verify [research.md](research.md) satisfies FR-012/FR-013: ≥3 candidate sources evaluated against no-auth, free, response speed, and disambiguation coverage, with one recommendation, rationale, and identified risks; fill any gaps
-- [ ] T019 [US3] Add the required CC BY 4.0 attribution for the chosen dataset to `README.md` and to the `--help`/version output in `cmd/citysearch/main.go`
+- [X] T018 [US3] Verify [research.md](research.md) satisfies FR-012/FR-013: ≥3 candidate sources evaluated against no-auth, free, response speed, and disambiguation coverage, with one recommendation, rationale, and identified risks; fill any gaps
+- [X] T019 [US3] Add the required CC BY 4.0 attribution for the chosen dataset to `README.md` and to the `--help`/version output in `cmd/citysearch/main.go`
 
 **Checkpoint**: Findings document is complete and the recommendation is reviewable in under 5 minutes (SC-006).
 
@@ -114,10 +114,10 @@ description: "Task list for City Search Spike implementation"
 
 **Purpose**: Validation and finishing touches across stories
 
-- [ ] T020 [P] Update `README.md` with build/run usage examples and the dataset attribution
-- [ ] T021 Run the [quickstart.md](quickstart.md) validation scenarios (steps 1–6) and confirm outputs and exit codes
-- [ ] T022 [P] Run `gofmt -l .`, `go vet ./...`, and `go test ./...` and resolve any findings
-- [ ] T023 Verify SC-002 (< 2 s) with `time ./bin/citysearch paris` and SC-004 (works offline, no auth) by running with no network
+- [X] T020 [P] Update `README.md` with build/run usage examples and the dataset attribution
+- [X] T021 Run the [quickstart.md](quickstart.md) validation scenarios (steps 1–6) and confirm outputs and exit codes
+- [X] T022 [P] Run `gofmt -l .`, `go vet ./...`, and `go test ./...` and resolve any findings
+- [X] T023 Verify SC-002 (< 2 s) with `time ./bin/citysearch paris` and SC-004 (works offline, no auth) by running with no network
 
 ---
 
