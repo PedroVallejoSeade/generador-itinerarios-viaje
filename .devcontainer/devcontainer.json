@@ -14,7 +14,7 @@
   
   "forwardPorts": [8080],
   
-  "postCreateCommand": "go version",
+  "postCreateCommand": "go version && curl -LsSf https://astral.sh/uv/install.sh | sh",
   
   "remoteUser": "vscode"
 }
