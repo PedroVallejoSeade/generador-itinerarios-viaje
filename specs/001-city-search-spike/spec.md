@@ -8,6 +8,15 @@
 
 **Input**: User description: "City Search Spike — As a travel itinerary app user I want to search for a city by name and see matching results so that I can select the correct city when multiple cities share a similar name. When a user types a city name in the terminal, the application should query a public city database and return a list of matching cities with enough context (country, region) to distinguish between them. This spike will research and evaluate the best public API or dataset to power this city search functionality in a Go terminal application, focusing on simplicity, no authentication requirements, and fast response times."
 
+## Clarifications
+
+### Session 2026-06-26
+
+- Q: When results are capped, how should matching cities be ranked so the intended one appears in the visible list? → A: Rank by population (largest/most prominent cities first).
+- Q: What is the maximum number of results displayed for a query? → A: 10 results maximum.
+- Q: What partial-match semantics should city-name matching use? → A: Prefix — match only when the city name starts with the query.
+- Q: What is the time box for the data-source evaluation spike? → A: 10 minutes.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Find a city by name (Priority: P1)
@@ -59,7 +68,7 @@ As the team building the itinerary generator, we need a documented evaluation of
 
 - **No matches**: When the entered name matches no city in the data source, the application displays a clear "no results found" message rather than failing or showing an empty, unexplained response.
 - **Empty input**: When the user enters a blank or whitespace-only query, the application prompts for a valid city name instead of querying the data source.
-- **Partial / misspelled names**: When the user enters a partial name (for example, "Franc"), the application returns reasonable matches where the entered text is contained in or prefixes a city name.
+- **Partial / misspelled names**: When the user enters a partial name (for example, "Franc"), the application returns cities whose names begin with the entered text (for example, "Frankfurt", "Francavilla").
 - **Data source unavailable**: When the underlying data source cannot be reached or returns an error, the application reports the problem on standard error and exits with a non-zero status, without crashing.
 - **Large result sets**: When a common name matches many cities, the application limits the displayed results to a manageable number so the output stays readable.
 - **Non-ASCII / accented names**: When a city name contains accents or non-Latin characters (for example, "São Paulo", "Zürich"), the search still returns the expected match.
@@ -70,10 +79,10 @@ As the team building the itinerary generator, we need a documented evaluation of
 
 - **FR-001**: System MUST accept a city name as text input from the user via the terminal.
 - **FR-002**: System MUST query a public city data source for entries matching the entered name.
-- **FR-003**: System MUST return a list of matching cities, supporting case-insensitive and partial-name matches.
+- **FR-003**: System MUST return a list of matching cities, supporting case-insensitive matching where a city name starts with the entered text (prefix match).
 - **FR-004**: Each result MUST include disambiguating context, at minimum the city's country and region/state.
 - **FR-005**: System MUST present results as human-readable text on standard output.
-- **FR-006**: System MUST limit the number of displayed results to a manageable count when many cities match.
+- **FR-006**: System MUST limit the number of displayed results to a maximum of 10 when many cities match, ranking results by population (largest/most prominent cities first) so the most likely intended city appears within the visible list.
 - **FR-007**: System MUST display a clear, explanatory message when no cities match the query.
 - **FR-008**: System MUST reject empty or whitespace-only queries with a prompt for valid input, without querying the data source.
 - **FR-009**: System MUST handle data-source or connectivity errors gracefully, reporting them on standard error and exiting with a non-zero status code.
@@ -101,10 +110,11 @@ As the team building the itinerary generator, we need a documented evaluation of
 
 ## Assumptions
 
-- **Match strategy**: Matching is case-insensitive and includes prefix/substring matches on the city name; exact-only matching is not required for the spike. This was chosen as a reasonable default because the user's goal is to find a city even with partial input.
-- **Result cap**: When many cities match, the application displays a bounded number of results (assumed up to 10, ordered by relevance such as population or name closeness) to keep terminal output readable.
+- **Match strategy**: Matching is case-insensitive and uses prefix matching — a city matches when its name starts with the entered text; full-substring and exact-only matching are not required for the spike. This was chosen because the user's goal is to find a city while typing the start of its name.
+- **Result cap**: When many cities match, the application displays at most 10 results, ranked by population with the largest/most prominent cities first, to keep terminal output readable.
 - **Disambiguation fields**: Country and region/state are sufficient context to distinguish cities for this spike; finer detail (e.g., county, coordinates) is optional and used only if readily available from the chosen source.
 - **Data source type**: Either a queryable public API or a bundled/downloadable open dataset is acceptable; the spike will determine which better satisfies the no-auth, free, and fast-response constraints.
 - **Scope boundary**: Selecting a city, persisting selections, and any downstream itinerary generation are out of scope for this spike — its scope ends at returning and displaying disambiguated matches plus the data-source recommendation.
 - **Interface**: Interaction is terminal/CLI-based with text input and output, consistent with the project's CLI Interface principle.
+- **Spike time-box**: The data-source evaluation (US3 / FR-012, FR-013) is time-boxed to 10 minutes, per the constitution's Spike-First Exploration principle; the findings document captures whatever comparison and recommendation is reached within that box.
 - **Spike disposability**: Code produced during the spike is exploratory and may be discarded; the durable deliverables are the working demonstration of city search and the data-source recommendation, after which the team returns to a test-first implementation workflow.
